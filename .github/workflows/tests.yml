@@ -1,0 +1,31 @@
+name: Helper tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  helper-tests:
+    name: Pure helpers (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Install .NET 8
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: 8.0.x
+      # This project links only FrameWindow and SettingLease. No game or loader files are needed.
+      - name: Run helper tests
+        run: dotnet run --project tests/StutterBuddies.Tests.csproj --configuration Release
